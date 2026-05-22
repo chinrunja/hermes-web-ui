@@ -2,7 +2,7 @@
 import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { NButton, NModal, useMessage } from "naive-ui";
+import { NButton, NModal } from "naive-ui";
 import { useAppStore } from "@/stores/hermes/app";
 import ModelSelector from "./ModelSelector.vue";
 import ProfileSelector from "./ProfileSelector.vue";
@@ -12,7 +12,6 @@ import { useSessionSearch } from '@/composables/useSessionSearch'
 import { changelog } from "@/data/changelog";
 
 const { t } = useI18n();
-const message = useMessage();
 const route = useRoute();
 const router = useRouter();
 const appStore = useAppStore();
@@ -38,15 +37,6 @@ function isGroupCollapsed(key: string) {
 
 function handleNav(key: string) {
   router.push({ name: key });
-}
-
-async function handleUpdate() {
-  const ok = await appStore.doUpdate();
-  if (ok) {
-    message.success(t('sidebar.updateSuccess'), { duration: 5000 });
-  } else {
-    message.error(t('sidebar.updateFailed'));
-  }
 }
 
 function handleReloadClient() {

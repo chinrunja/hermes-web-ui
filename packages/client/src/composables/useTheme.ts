@@ -3,7 +3,6 @@ import { ref, watch, computed } from 'vue'
 export type BrightnessMode = 'light' | 'dark' | 'system'
 
 const BRIGHTNESS_KEY = 'hermes_brightness'
-const STYLE_KEY = 'hermes_style'
 
 const brightness = ref<BrightnessMode>(
   (localStorage.getItem(BRIGHTNESS_KEY) as BrightnessMode) || 'system',
