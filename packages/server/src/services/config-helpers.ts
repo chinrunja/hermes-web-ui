@@ -211,7 +211,18 @@ export async function listFilesRecursive(dir: string, prefix: string): Promise<{
 
 export async function fetchProviderModels(baseUrl: string, apiKey: string, freeOnly = false): Promise<string[]> {
   const base = baseUrl.replace(/\/+$/, '')
-  const modelsUrl = /\/v\d+\/?$/.test(base) ? `${base}/models` : `${base}/v1/models`
+  const isGoogleApi = /googleapis/.test(base)
+  // 匹配 /v1 /v12 /v1beta /v1-alpha 等
+  const hasVersion = /\/v\d+(?:[._-]?[a-zA-Z0-9]+)*\/?$/.test(base)
+  let modelsUrl = hasVersion ? base : `${base}/v1`
+  if (apiKey) {
+    if (isGoogleApi) {
+      modelsUrl += '/openai/models'
+    } else {
+      modelsUrl += '/models'
+    }
+  }
+
   try {
     const res = await fetch(modelsUrl, {
       headers: { Authorization: `Bearer ${apiKey}` },
