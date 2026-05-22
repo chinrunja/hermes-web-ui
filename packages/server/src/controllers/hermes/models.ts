@@ -768,10 +768,7 @@ export async function fetchProviderModelList(ctx: any) {
     const hasVersion = /\/v\d+(?:[._-]?[a-zA-Z0-9]+)*\/?$/.test(base)
     let modelsUrl = hasVersion ? base : `${base}/v1`
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
+    const headers: Record<string, string> = {}
     if (apiKey) {
       headers.Authorization = `Bearer ${apiKey}`
 
@@ -783,7 +780,6 @@ export async function fetchProviderModelList(ctx: any) {
     }
 
     const res = await fetch(modelsUrl, {
-      method: 'GET',
       headers,
       signal: AbortSignal.timeout(8000),
     })
@@ -802,8 +798,9 @@ export async function fetchProviderModelList(ctx: any) {
 
     let models = data.data
       .map(m => String(m?.id || '').trim())
+      // googleapi -> models/gemini -> gemini
+      .map(m => isGoogleApi ? m.slice(7) : m)
       .filter(Boolean)
-    console.log(models)
     if (freeOnly) models = models.filter(m => m.endsWith(':free'))
     ctx.body = { models: Array.from(new Set(models)).sort() }
   } catch (err: any) {

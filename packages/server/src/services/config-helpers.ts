@@ -237,7 +237,10 @@ export async function fetchProviderModels(baseUrl: string, apiKey: string, freeO
       logger.warn('available-models %s returned unexpected format', modelsUrl)
       return []
     }
-    let models = data.data.map(m => m.id)
+    let models = data.data
+      .map(m => m.id)
+      // googleapi -> models/gemini -> gemini
+      .map(m => isGoogleApi ? m.slice(7) : m)
     if (freeOnly) models = models.filter(m => m.endsWith(':free'))
     return models.sort()
   } catch (err: any) {
