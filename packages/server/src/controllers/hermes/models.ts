@@ -763,11 +763,27 @@ export async function fetchProviderModelList(ctx: any) {
     }
 
     const base = baseUrl.replace(/\/+$/, '')
-    const modelsUrl = /\/v\d+\/?$/.test(base) ? `${base}/models` : `${base}/v1/models`
-    const headers: Record<string, string> = {}
-    if (apiKey) headers.Authorization = `Bearer ${apiKey}`
+    const isGoogleApi = /googleapis/.test(base)
+    // 匹配 /v1 /v12 /v1beta /v1-alpha 等
+    const hasVersion = /\/v\d+(?:[._-]?[a-zA-Z0-9]+)*\/?$/.test(base)
+    let modelsUrl = hasVersion ? base : `${base}/v1`
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+    if (apiKey) {
+      headers.Authorization = `Bearer ${apiKey}`
+
+      if (isGoogleApi) {
+        modelsUrl += '/openai/models'
+      } else {
+        modelsUrl += '/models'
+      }
+    }
 
     const res = await fetch(modelsUrl, {
+      method: 'GET',
       headers,
       signal: AbortSignal.timeout(8000),
     })
@@ -787,6 +803,7 @@ export async function fetchProviderModelList(ctx: any) {
     let models = data.data
       .map(m => String(m?.id || '').trim())
       .filter(Boolean)
+    console.log(models)
     if (freeOnly) models = models.filter(m => m.endsWith(':free'))
     ctx.body = { models: Array.from(new Set(models)).sort() }
   } catch (err: any) {
