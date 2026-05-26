@@ -21,6 +21,7 @@ packages/server/dist
 ROADMAP.md
 pnpm-lock.yaml
 pnpm-workspace.yaml
+.nvmrc
 # Server data
 packages/server/data/
 packages/server/node_modules/
